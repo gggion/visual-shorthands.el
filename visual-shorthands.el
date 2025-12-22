@@ -257,6 +257,26 @@ When RENEW is non-nil, obtain symbol bounds at point instead."
 ;;;; Commands
 
 ;;;###autoload
+(defun visual-shorthands-reveal-at-point ()
+  "Manually reveal the symbol at point."
+  (interactive)
+  (if-let ((symbol-bounds (visual-shorthands--current-symbol)))
+      (progn
+        (visual-shorthands--reveal-symbol symbol-bounds)
+        (message "Symbol revealed"))
+    (message "No shortened symbol at point")))
+
+;;;###autoload
+(defun visual-shorthands-hide-at-point ()
+  "Manually hide the symbol at point."
+  (interactive)
+  (if-let ((symbol-bounds (bounds-of-thing-at-point 'symbol)))
+      (progn
+        (visual-shorthands--hide-symbol symbol-bounds)
+        (message "Symbol hidden"))
+    (message "No symbol at point")))
+
+;;;###autoload
 (defun visual-shorthands-add-mapping (longhand shorthand)
   "Add visual shorthand mapping from LONGHAND to SHORTHAND."
   (interactive "sLonghand prefix: \nsShorthand replacement: ")
