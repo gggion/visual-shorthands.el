@@ -59,9 +59,23 @@ background to distinguish visual shorthands from real shorthands.
 Only applied to the shorthand prefix portion of symbols."
   :group 'visual-shorthands)
 
+;;;; Internal variables
+
 (defvar-local visual-shorthands-alist nil
   "Alist of (LONGHAND-PREFIX . SHORTHAND-PREFIX) pairs.
 Automatically sorted by prefix length (longest first).")
+
+(defvar-local visual-shorthands--prev-symbol nil
+  "Previous symbol bounds that surrounded the cursor.")
+
+(defvar-local visual-shorthands--timer nil
+  "Current active timer for delayed reveal.")
+
+(defvar-local visual-shorthands--do-reveal nil
+  "Non-nil when mode is notified to start revealing.")
+
+(defvar-local visual-shorthands--symbol-revealed nil
+  "Non-nil if the last encountered symbol has been revealed.")
 
 ;;;; Core Implementation
 
