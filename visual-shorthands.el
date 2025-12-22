@@ -37,6 +37,11 @@
 
 ;;; Code:
 
+(defgroup visual-shorthands nil
+  "Visual shorthand overlays for improved code readability."
+  :group 'convenience
+  :prefix "visual-shorthands-")
+
 (defvar-local visual-shorthands-alist nil
   "Alist of (LONGHAND-PREFIX . SHORTHAND-PREFIX) pairs.
 Automatically sorted by prefix length (longest first).")
