@@ -296,15 +296,42 @@ Abbreviates PREFIXES only:
 
 ;;;###autoload
 (define-minor-mode visual-shorthands-mode
-  "Visually abbreviate symbol prefixes.
+  "Toggle visual shorthand overlays with auto-reveal in current buffer.
 
-Abbreviates prefixes defined in `visual-shorthands-alist'.
-Buffer content remains unchanged - this is display-only."
+When enabled, long symbol prefixes defined in
+`visual-shorthands-alist' are visually replaced with shorter
+alternatives using overlays with the `invisible' property.
+
+Symbols are automatically revealed when the cursor enters them,
+allowing normal character-by-character navigation through the
+actual buffer text."
+  :init-value nil
   :lighter " VS"
-  (if visual-shorthands-mode
-      (visual-shorthands--apply-to-buffer)
-    (remove-overlays (point-min) (point-max) 'vs-shorthand t)
-    (remove-from-invisibility-spec 'visual-shorthands)))
+  :group 'visual-shorthands
+
+  (cond
+   (visual-shorthands-mode
+    ;; Enable mode
+    (visual-shorthands--apply-to-buffer)
+    (add-hook 'post-command-hook #'visual-shorthands--post-cmd nil t)
+    (when (eq visual-shorthands-trigger 'on-change)
+      (add-hook 'after-change-functions #'visual-shorthands--after-change nil t)))
+
+   (t
+    ;; Disable mode - clean up
+    (when-let ((current-symbol (visual-shorthands--current-symbol)))
+      (visual-shorthands--reveal-symbol current-symbol)
+      (when visual-shorthands--timer
+        (cancel-timer visual-shorthands--timer)
+        (setq visual-shorthands--timer nil)))
+    (remove-overlays (point-min) (point-max) 'visual-shorthand t)
+    (remove-from-invisibility-spec 'visual-shorthands)
+    (remove-hook 'post-command-hook #'visual-shorthands--post-cmd t)
+    (when (eq visual-shorthands-trigger 'on-change)
+      (remove-hook 'after-change-functions #'visual-shorthands--after-change t))
+    (setq visual-shorthands--prev-symbol nil
+          visual-shorthands--symbol-revealed nil
+          visual-shorthands--do-reveal nil))))
 
 (provide 'visual-shorthands)
 ;;; visual-shorthands.el ends here
