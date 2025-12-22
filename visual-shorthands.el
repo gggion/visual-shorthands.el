@@ -262,6 +262,18 @@ When RENEW is non-nil, obtain symbol bounds at point instead."
   "Signal that symbols in current buffer should be revealed on change."
   (setq visual-shorthands--do-reveal t))
 
+(defun visual-shorthands--before-revert ()
+  "Remove overlays before buffer revert.
+Installed on `before-revert-hook' when mode is active."
+  (when visual-shorthands-mode
+    (remove-overlays (point-min) (point-max) 'visual-shorthand t)))
+
+(defun visual-shorthands--after-revert ()
+  "Reapply overlays after buffer revert.
+Installed on `after-revert-hook' when mode is active."
+  (when visual-shorthands-mode
+    (visual-shorthands--apply-to-buffer)))
+
 (defun visual-shorthands-manual-start ()
   "Signal that symbols in current buffer should be revealed."
   (interactive)
@@ -295,6 +307,8 @@ actual buffer text."
     ;; Enable mode
     (visual-shorthands--apply-to-buffer)
     (add-hook 'post-command-hook #'visual-shorthands--post-cmd nil t)
+    (add-hook 'before-revert-hook #'visual-shorthands--before-revert nil t)
+    (add-hook 'after-revert-hook #'visual-shorthands--after-revert nil t)
     (when (eq visual-shorthands-trigger 'on-change)
       (add-hook 'after-change-functions #'visual-shorthands--after-change nil t)))
 
@@ -308,6 +322,8 @@ actual buffer text."
     (remove-overlays (point-min) (point-max) 'visual-shorthand t)
     (remove-from-invisibility-spec 'visual-shorthands)
     (remove-hook 'post-command-hook #'visual-shorthands--post-cmd t)
+    (remove-hook 'before-revert-hook #'visual-shorthands--before-revert t)
+    (remove-hook 'after-revert-hook #'visual-shorthands--after-revert t)
     (when (eq visual-shorthands-trigger 'on-change)
       (remove-hook 'after-change-functions #'visual-shorthands--after-change t))
     (setq visual-shorthands--prev-symbol nil
@@ -335,10 +351,10 @@ Returns count of matched symbols."
           (count 0)
           (re (concat "\\_<" (regexp-quote longhand) "\\(?:\\sw\\|\\s_\\)+")))
       (save-excursion
-         (save-restriction
-         (widen)
-         (goto-char (point-min))
-         (while (re-search-forward re nil t)
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (while (re-search-forward re nil t)
             (let* ((symbol-start (match-beginning 0))
                    (symbol-end (match-end 0))
                    (face-at-point (get-text-property symbol-start 'face))
