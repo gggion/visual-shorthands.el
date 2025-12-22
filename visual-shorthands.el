@@ -157,6 +157,26 @@ Uses invisible property on the longhand prefix and before-string for shorthand."
       (add-to-invisibility-spec 'visual-shorthands)
       (visual-shorthands--apply-to-region (point-min) (point-max)))))
 
+(defun visual-shorthands--reveal-symbol (symbol-bounds)
+  "Reveal the symbol at SYMBOL-BOUNDS by removing invisibility."
+  (let ((start (car symbol-bounds))
+        (end (cdr symbol-bounds)))
+    (dolist (ov (overlays-in start end))
+      (when (overlay-get ov 'visual-shorthand)
+        (overlay-put ov 'invisible nil)
+        (overlay-put ov 'before-string nil)))))
+
+(defun visual-shorthands--hide-symbol (symbol-bounds)
+  "Hide the symbol at SYMBOL-BOUNDS by reapplying invisibility."
+  (let ((start (car symbol-bounds))
+        (end (cdr symbol-bounds)))
+    (dolist (ov (overlays-in start end))
+      (when-let ((data (overlay-get ov 'visual-shorthand-data)))
+        (let ((shorthand (cdr data)))
+          (overlay-put ov 'invisible 'visual-shorthands)
+          (overlay-put ov 'before-string
+                       (propertize shorthand 'face 'visual-shorthands-face)))))))
+
 ;;;; Commands
 
 ;;;###autoload
