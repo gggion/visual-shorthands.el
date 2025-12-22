@@ -177,6 +177,20 @@ Uses invisible property on the longhand prefix and before-string for shorthand."
           (overlay-put ov 'before-string
                        (propertize shorthand 'face 'visual-shorthands-face)))))))
 
+(defun visual-shorthands--reveal-with-lock (symbol-bounds &optional renew)
+  "Reveal symbol at SYMBOL-BOUNDS.
+When RENEW is non-nil, obtain symbol bounds at point instead."
+  (when renew
+    (setq symbol-bounds (visual-shorthands--current-symbol))
+    (setq visual-shorthands--prev-symbol symbol-bounds)
+    (setq visual-shorthands--timer nil))
+
+  (when symbol-bounds
+    (let ((start (car symbol-bounds))
+          (end (cdr symbol-bounds)))
+      (font-lock-ensure start end)
+      (visual-shorthands--reveal-symbol symbol-bounds))))
+
 ;;;; Commands
 
 ;;;###autoload
