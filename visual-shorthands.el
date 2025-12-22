@@ -60,6 +60,21 @@ background to distinguish visual shorthands from real shorthands.
 Only applied to the shorthand prefix portion of symbols."
   :group 'visual-shorthands)
 
+(defcustom visual-shorthands-trigger 'always
+  "Method of triggering element toggling.
+`always' means that symbols are revealed when cursor enters them.
+`on-change' means symbols are revealed only when buffer is modified.
+`manual' means toggling starts on `visual-shorthands-manual-start'."
+  :type '(choice (const :tag "Always reveal on cursor" always)
+          (const :tag "Only on buffer change" on-change)
+          (const :tag "Manual control" manual))
+  :group 'visual-shorthands)
+
+(defcustom visual-shorthands-delay 0.0
+  "Seconds of delay before revealing a symbol under cursor."
+  :type 'number
+  :group 'visual-shorthands)
+
 ;;;; Internal variables
 
 (defvar-local visual-shorthands-alist nil
