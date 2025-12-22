@@ -257,26 +257,19 @@ When RENEW is non-nil, obtain symbol bounds at point instead."
 ;;;; Commands
 
 ;;;###autoload
-(defun visual-shorthands-add (longhand shorthand)
-  "Add mapping from LONGHAND prefix to SHORTHAND prefix.
-
-Example: (visual-shorthands-add \"long_prefix_\" \"lp_\")
-
-Abbreviates PREFIXES only:
-  long_prefix_function -> lp_function  (works)
-  new_name -> nn  (does not work)"
-  (interactive "sLonghand prefix: \nsShorthand: ")
-  (setq-local visual-shorthands-alist
-              (cons (cons longhand shorthand)
-                    (assoc-delete-all longhand visual-shorthands-alist)))
-  ;; Sort by length descending so longest prefixes match first
-  (setq-local visual-shorthands-alist
-              (sort visual-shorthands-alist
-                    (lambda (a b) (> (length (car a)) (length (car b))))))
+(defun visual-shorthands-add-mapping (longhand shorthand)
+  "Add visual shorthand mapping from LONGHAND to SHORTHAND."
+  (interactive "sLonghand prefix: \nsShorthand replacement: ")
+  (setq visual-shorthands-alist
+        (cons (cons longhand shorthand)
+              (assoc-delete-all longhand visual-shorthands-alist)))
+  (setq visual-shorthands-alist
+        (sort visual-shorthands-alist
+              (lambda (a b) (> (length (car a)) (length (car b))))))
   (when visual-shorthands-mode
-    (visual-shorthands-mode -1)
-    (visual-shorthands-mode 1))
-  (message "Added: %s → %s" longhand shorthand))
+    (remove-overlays (point-min) (point-max) 'visual-shorthand t)
+    (visual-shorthands--apply-to-buffer))
+  (message "Added mapping: %s → %s" longhand shorthand))
 
 
 ;;;###autoload
