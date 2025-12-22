@@ -285,6 +285,15 @@ When RENEW is non-nil, obtain symbol bounds at point instead."
     (visual-shorthands--apply-to-buffer))
   (message "Removed mapping for: %s" longhand))
 
+(defun visual-shorthands-clear-mappings ()
+  "Clear all visual shorthand mappings."
+  (interactive)
+  (setq visual-shorthands-alist nil)
+  (when visual-shorthands-mode
+    (remove-overlays (point-min) (point-max) 'visual-shorthand t)
+    (remove-from-invisibility-spec 'visual-shorthands))
+  (message "Cleared all visual shorthand mappings"))
+
 ;;;###autoload
 (defun visual-shorthands-manual-start ()
   "Signal that symbols in current buffer should be revealed."
