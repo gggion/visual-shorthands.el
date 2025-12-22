@@ -250,6 +250,10 @@ When RENEW is non-nil, obtain symbol bounds at point instead."
     (when (not (eq visual-shorthands-trigger 'manual))
       (setq visual-shorthands--do-reveal nil))))
 
+(defun visual-shorthands--after-change (&rest _args)
+  "Signal that symbols in current buffer should be revealed on change."
+  (setq visual-shorthands--do-reveal t))
+
 ;;;; Commands
 
 ;;;###autoload
