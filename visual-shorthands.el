@@ -38,6 +38,8 @@
 ;;; Code:
 (require 'cl-lib)
 
+(defvar visual-shorthands-mode)  ; Forward declaration for byte-compiler
+
 (defgroup visual-shorthands nil
   "Visual shorthand overlays for improved code readability."
   :group 'convenience
