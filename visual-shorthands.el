@@ -98,18 +98,20 @@ Automatically sorted by prefix length (longest first).")
         (memq 'font-lock-comment-face faces)
         (memq 'font-lock-doc-face faces))))
 
-(defun visual-shorthands--create-overlay (start longhand shorthand)
-  "Create overlay at START hiding LONGHAND, showing SHORTHAND.
-
-Uses `invisible' property instead of `display' to allow cursor
-navigation through actual text.  See Info node `(elisp)Invisible Text'."
-  (let ((ov (make-overlay start (+ start (length longhand)) nil t nil)))
-    (overlay-put ov 'invisible 'visual-shorthands)
-    (overlay-put ov 'before-string shorthand)
-    (overlay-put ov 'vs-shorthand t)
-    (overlay-put ov 'vs-data (cons longhand shorthand))
-    (overlay-put ov 'evaporate t)
-    ov))
+(defun visual-shorthands--create-overlay (beg end longhand shorthand)
+  "Create overlay from BEG to END hiding LONGHAND and showing SHORTHAND.
+Uses invisible property on the longhand prefix and before-string for shorthand."
+  (let* ((longhand-len (length longhand))
+         (shorthand-len (length shorthand))
+         (overlay (make-overlay beg (+ beg longhand-len) nil t nil))
+         (shorthand-string (propertize shorthand
+                                       'face 'visual-shorthands-face)))
+    (overlay-put overlay 'invisible 'visual-shorthands)
+    (overlay-put overlay 'before-string shorthand-string)
+    (overlay-put overlay 'visual-shorthand t)
+    (overlay-put overlay 'visual-shorthand-data (cons longhand shorthand))
+    (overlay-put overlay 'evaporate t)
+    overlay))
 
 (defun visual-shorthands--apply ()
   "Apply abbreviations to all symbols in buffer.
