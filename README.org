@@ -7,9 +7,9 @@ display layer and can be toggled interactively.
 
 The package is designed for /reading/ code written by others with verbose naming
 conventions, such as Emacs Lisp code and packages, but it can still be used in
-other languages like Lisps, python, etc. If you need actual Namespaces, use the
-[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html][built-in shorthands]]. Symbols are automatically revealed when the cursor enters
-them, allowing normal navigation and editing of the actual buffer text.
+other languages. If you need actual Namespaces, use the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Shorthands.html][built-in shorthands]].
+Symbols are automatically revealed when the cursor enters them, allowing normal
+navigation and editing of the actual buffer text.
 
 * Screenshots
 #+begin_quote
@@ -29,3 +29,57 @@ Mappings are buffer-local.
 | ~visual-shorthands-add-mapping~    | Add visual shorthand mapping from LONGHAND to SHORTHAND.             |
 | ~visual-shorthands-clear-mappings~ | Clear all visual shorthand mappings.                                 |
 | ~visual-shorthands-remove-mapping~ | Remove visual shorthand mapping for LONGHAND.                        |
+
+* Installation
+
++ Vanilla Emacs :: Clone the repository and load the package:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/visual-shorthands")
+(require 'visual-shorthands)
+#+end_src
+
++ Doom Emacs :: Add to =packages.el= and =config.el=
+
+#+begin_src emacs-lisp
+;; package.el
+(package! visual-shorthands
+  :recipe (:host github :repo "gggion/visual-shorthands.el"))
+
+;; config.el
+(use-package! visual-shorthands
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'visual-shorthands-mode))
+#+end_src
+
++ use-package with straight.el ::
+
+#+begin_src emacs-lisp
+(use-package visual-shorthands
+  :straight (:host github :repo "gggion/visual-shorthands.el")
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'visual-shorthands-mode))
+#+end_src
+
+* Configuration
++ Setup ::
+
+#+begin_src emacs-lisp
+(use-package visual-shorthands
+  :config
+  ;; Enable in specific modes
+  (add-hook 'emacs-lisp-mode-hook #'visual-shorthands-mode))
+#+end_src
+
++ Interactive Mapping Creation :: As shown in the above gif, call ~M-x visual-shorthands-add-mapping~ to create mappings interactively. As you type the longhand prefix, matching symbols in the buffer are highlighted with ~visual-shorthands-preview-face~, needs the mode to be active in the buffer.
+
++ Project-Specific Configuration :: You can also use directory-local variables for project-specific mappings.
+
+#+begin_src emacs-lisp
+;; In .dir-locals.el at project root
+((nil . ((eval . (progn
+                   (visual-shorthands-add-mapping "package-function-long-prefix--" "pflp:")
+                   (visual-shorthands-mode 1))))))
+#+end_src
+
+
