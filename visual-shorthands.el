@@ -134,6 +134,33 @@ Uses invisible property on the longhand prefix and before-string for shorthand."
     (overlay-put overlay 'visual-shorthand t)
     (overlay-put overlay 'visual-shorthand-data (cons longhand shorthand))
     (overlay-put overlay 'evaporate t)
+
+    ;; Isearch integration
+    ;; Permanent reveal when isearch exits with point in overlay
+    (overlay-put overlay 'isearch-open-invisible
+                 (lambda (ov)
+                   (overlay-put ov 'invisible nil)
+                   (overlay-put ov 'before-string nil)))
+
+    ;; Temporary reveal during active isearch
+    ;; HIDE-P nil means show, non-nil means hide
+    (overlay-put overlay 'isearch-open-invisible-temporary
+                 (lambda (ov hide-p)
+                   (if hide-p
+                       ;; Restore invisibility
+                       (progn
+                         (overlay-put ov 'invisible 'visual-shorthands)
+                         (overlay-put ov 'before-string shorthand-string))
+                     ;; Make visible
+                     (overlay-put ov 'invisible nil)
+                     (overlay-put ov 'before-string nil))))
+
+    ;; TODO 2026-01-02: Optimize overlay property storage
+    ;; Store shorthand-string as 'visual-shorthand-string property instead of
+    ;; keeping 'visual-shorthand-data. That would eliminate propertize calls in
+    ;; visual-shorthands--hide-symbol. Seems like we're currently reconstructing
+    ;; the propertized string on every hide operation.
+
     overlay))
 
 (defun visual-shorthands--apply-to-region (start end)
