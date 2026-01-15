@@ -434,8 +434,12 @@ Also see `visual-shorthands-remove-mapping' and
      (add-hook 'minibuffer-setup-hook
                #'visual-shorthands--preview-minibuffer-setup)
      (unwind-protect
-         (let* ((longhand-input
-                 (read-string "Longhand prefix: "))
+         (let* ((default-longhand
+                  (when (use-region-p)
+                    (buffer-substring-no-properties
+                     (region-beginning) (region-end))))
+                (longhand-input
+                 (read-string "Longhand prefix: " default-longhand))
                 (shorthand-input
                  (progn
                    (visual-shorthands--preview-cleanup)
